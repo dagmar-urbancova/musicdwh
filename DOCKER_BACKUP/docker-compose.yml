@@ -1,0 +1,33 @@
+version: '3'
+services:
+  database:
+    image: "postgres:13"
+    # command: ["postgres", "-c", "log_statement=all"]
+    # env_file:
+    #   - database.env
+    environment:
+      - POSTGRES_USER=docker
+      - POSTGRES_PASSWORD=docker
+      - POSTGRES_DB=docker
+
+    volumes:
+      - ./sql_scripts/startup_sql_scripts:/docker-entrypoint-initdb.d/
+    ports: 
+      - 5432:5432
+  
+  loader:
+    depends_on: 
+      - database 
+    build: 
+      dockerfile: "loader.Dockerfile"
+      context: .
+    environment: 
+      - DATA_DATE='2021-04-29'
+    links:
+      - database
+
+  busybox:
+    image: busybox
+    links:
+      - database
+    entrypoint: "nc -z database 5432"

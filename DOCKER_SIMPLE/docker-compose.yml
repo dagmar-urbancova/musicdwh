@@ -1,0 +1,8 @@
+version: "3.8"
+services:
+  app :
+    build: ./musicdwh/
+    environment: 
+      - DATA_DATE='2021-04-29'    
+  db:
+    build: ./sql_scripts/
