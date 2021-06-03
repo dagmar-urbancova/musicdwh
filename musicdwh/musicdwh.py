@@ -6,28 +6,10 @@ import sys
 import time
 from datetime import datetime
 import pandas as pd
-import json
-import urllib.request # get country from IP address
-# develop in jupyter, convert to python when ready
-# jupyter nbconvert --to script *.ipynb
+
 import ipapi
 import sqlalchemy as sqla
 
-# define database connection
-# TODO: save connection externally
-db_name = 'docker'
-db_user = 'docker'
-db_pass = 'docker'
-db_host = 'database'
-db_port = '5432'
-
-# DB_CONNECTION = 'postgresql://{}:{}@{}:{}/{}'.format(db_user, db_pass, db_host, db_port, db_name)
-DB_CONNECTION = "postgresql://docker:docker@database:5432/docker"
-DATA_PATH = './data'
-DB_LAYER_0 = 'layer0'
-DB_LAYER_1 = 'layer1'
-RETRY_COUNT = 5
-DELAY_TIME = 5
 
 try:
     DATA_DATE = os.environ['DATA_DATE']
@@ -35,6 +17,28 @@ try:
 except:
     print('Envvar DATA_DATE not set.')
     sys.exit(1)
+
+try:
+    POSTGRES_PASSWORD = os.environ['POSTGRES_PASSWORD']
+    print('Using password from POSTGRES_PASSWORD')
+except:
+    print('Envvar POSTGRES_PASSWORD not set.')
+    sys.exit(1)
+
+# define database connection
+db_name = 'docker'
+db_user = 'docker'
+db_pass = POSTGRES_PASSWORD
+db_host = 'database'
+db_port = '5432'
+DB_CONNECTION = 'postgresql://{}:{}@{}:{}/{}'.format(db_user, db_pass, db_host, db_port, db_name)
+
+# define constants
+DATA_PATH = './data'
+DB_LAYER_0 = 'layer0'
+DB_LAYER_1 = 'layer1'
+RETRY_COUNT = 5
+DELAY_TIME = 5
 
 def import_hb(file_path):
     # import csv file - hb
@@ -45,7 +49,6 @@ def import_hb(file_path):
         return(data_hb2)
     except:
         print('hb data not accessible')
-    #, nrows= 20
 
 def import_wwc(file_path):
     # import json file - wwc
@@ -102,7 +105,6 @@ def ip_convert_country  (
             country_code = 'NaN'
         code_list.append(country_code)
         size_counter += 1
-        #print("Size counter: "+ str(size_counter))
     code_series = pd.Series(code_list)
     return(code_series)
 
@@ -112,14 +114,16 @@ def import_game (
                 export_date, 
                 data_path
                 ):
-
-    export_date_d=datetime.strptime(export_date,'%Y-%m-%d')
+    try:
+        export_date_d=datetime.strptime(export_date,'%Y-%m-%d')
+    except:
+        print('DATA_DATE is not in the right format. Please set in format YYYY-MM-DD.')
+        sys.exit(1)
     date_y = export_date_d.strftime("%Y")
     date_m = export_date_d.strftime("%m")
     date_d = export_date_d.strftime("%d")
-    #data_path = '/home/dada/projects/musicdwh/musicdwh/data'
+    #data_path = '/musicdwh/musicdwh/data/'
     wwc_path = '/wwc/{}/{}/{}/wwc.json'.format(date_y, date_m, date_d)
-    #wwc_path = '/wwc' + '/' + date_y + '/' + date_m + '/' + date_d + '/wwc.json'
     hb_path = '/hb' + '/' + date_y + '/' + date_m + '/' + date_d + '/hb.csv'
     # expecting date in format 'YYYY-MM-DD'
     if game_id == 'wwc':
@@ -137,28 +141,7 @@ def connect_to_db(db_con, retry_count, delay):
     print('Connecting to {}'.format(db_con))
     engine = sqla.create_engine(db_con, isolation_level="AUTOCOMMIT")
     
-    # engine = ''
-    # print('Connecting to {}'.format(db_con))
-    # for i in range(0, retry_count):
-    #     try:
-    #         engine = sqla.create_engine(db_con, isolation_level="AUTOCOMMIT")
-    #         result = engine.execute(
-    #             sqla.text(
-    #                 "SELECT 1"
-    #             )
-    #         )
-    #         print('Connected to DB.')
-    #         break
-    #     except:
-    #         time.sleep(delay)
-    #         print('Waiting for database connection Vitkov a prdel.')
-    # if engine == '':
-    #     print('DB connecton failed.')
-    #     sys.exit(1)
     return engine
-
-
-
 
 def upload_to_db    (
                     df, 
