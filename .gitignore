@@ -59,6 +59,7 @@ unused_scripts.ipynb
 
 # Jupyter Notebook
 .ipynb_checkpoints
+.ipynb
 
 # IPython
 profile_default/
@@ -95,3 +96,4 @@ venv.bak/
 
 # VS Code
 *.code-workspace
+.vscode
