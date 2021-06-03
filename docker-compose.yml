@@ -22,17 +22,21 @@ services:
       dockerfile: "loader.Dockerfile"
       context: .
     environment: 
-      - DATA_DATE='2021-04-29'
+      - POSTGRES_PASSWORD=docker
+      - DATA_DATE=2021-04-29
+    volumes: 
+      - ./data/:/data/
+      - ./sql_scripts/:/sql_scripts/
     links:
       - database
-    # command: tail -F anything
-    entrypoint: /bin/bash
+    command: ["./wait-for-postgres.sh", "database", "python", "musicdwh.py"]
 
-  busybox:
-    depends_on: 
-      - database     
-    image: busybox
-    command: tail -F anything
-    links:
-      - database
+
+  # busybox:
+  #   depends_on: 
+  #     - database     
+  #   image: busybox
+  #   command: tail -F anything
+  #   links:
+  #     - database
     # entrypoint: "ping -c5 database && nc -vc database 5432"

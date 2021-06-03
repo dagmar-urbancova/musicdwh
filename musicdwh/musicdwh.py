@@ -18,10 +18,11 @@ import sqlalchemy as sqla
 db_name = 'docker'
 db_user = 'docker'
 db_pass = 'docker'
-db_host = 'localhost'
+db_host = 'database'
 db_port = '5432'
 
-DB_CONNECTION = 'postgresql://{}:{}@{}:{}/{}'.format(db_user, db_pass, db_host, db_port, db_name)
+# DB_CONNECTION = 'postgresql://{}:{}@{}:{}/{}'.format(db_user, db_pass, db_host, db_port, db_name)
+DB_CONNECTION = "postgresql://docker:docker@database:5432/docker"
 DATA_PATH = './data'
 DB_LAYER_0 = 'layer0'
 DB_LAYER_1 = 'layer1'
@@ -132,25 +133,29 @@ def import_game (
     return(imported_data)
 
 def connect_to_db(db_con, retry_count, delay):
-    engine = ''
+    
     print('Connecting to {}'.format(db_con))
-    for i in range(0, retry_count):
-        try:
-            engine = sqla.create_engine(db_con, isolation_level="AUTOCOMMIT")
-            result = engine.execute(
-                sqla.text(
-                    "SELECT 1"
-                )
-            )
-            print('Connected to DB.')
-            break
-        except:
-            time.sleep(delay)
-            print('Waiting for database connection Vitkov a prdel.')
-    if engine == '':
-        print('DB connecton failed.')
-        sys.exit(1)
-    return(engine)
+    engine = sqla.create_engine(db_con, isolation_level="AUTOCOMMIT")
+    
+    # engine = ''
+    # print('Connecting to {}'.format(db_con))
+    # for i in range(0, retry_count):
+    #     try:
+    #         engine = sqla.create_engine(db_con, isolation_level="AUTOCOMMIT")
+    #         result = engine.execute(
+    #             sqla.text(
+    #                 "SELECT 1"
+    #             )
+    #         )
+    #         print('Connected to DB.')
+    #         break
+    #     except:
+    #         time.sleep(delay)
+    #         print('Waiting for database connection Vitkov a prdel.')
+    # if engine == '':
+    #     print('DB connecton failed.')
+    #     sys.exit(1)
+    return engine
 
 
 
@@ -170,6 +175,7 @@ def upload_to_db    (
 
 # main script
 if __name__ == '__main__':
+    print("=================================starting load====================================")
     engine = connect_to_db(DB_CONNECTION, RETRY_COUNT, DELAY_TIME)
     # populate LOVs
     LOV_PATH = '{}/LOVs'.format(DATA_PATH)

@@ -18,8 +18,8 @@ GROUP BY acct.src_sys, gen.gender;
 /*02 - youngest and oldest player per country*/
 select
 	src.country_id,
-	AGE(src.min_dob) as youngest_user,
-	AGE(src.max_dob) as oldest_user
+	AGE(src.max_dob) as youngest_user,
+	AGE(src.min_dob) as oldest_user
 FROM
 	(	
 		SELECT 
