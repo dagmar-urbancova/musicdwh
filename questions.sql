@@ -53,3 +53,9 @@ order by src.country_id
 	- Data monitoring tools - latency, missing data, inconsistent dataset
 	
 */
+
+/* 04 - list of principles you would follow when developing an event pipeline */
+/*
+
+
+*/

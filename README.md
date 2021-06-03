@@ -9,6 +9,7 @@ The solution is based on Python with a database running on PostgreSQL. Database 
 Virtual environments for both systems are created using Docker and are managed by Docker-compose.
 
 ### Main files:
+#### **Python files:**
 - musicdwh/musicdwh.py
 
 Python script opening extract files from a given date. Games have two sources, "hb" in .csv and "wwc" in .json. They come in once a day and are exported into folder structure based on date.
@@ -17,6 +18,17 @@ This makes the code run slowly. There are other IP converters available, all hav
 - wwc data comes in .json format, one cell can contain lists of different values. The lists are parsed into new columns of dataframe upon load.
 - two lists of values (LOVs) have been added to the load to enable saving repetitive data in separate tables.
 - data in the database is updated with new values, right now there is no historization feature. This can be added in the future.
+
+#### **SQL scripts working with the data:**
+- sql_scripts/startup_sql_scripts : scripts setting up the database, tables and views
+- sql_scripts/04_L0_L1_load.sql : ETL script processing data from layer0 to layer1, creating dependencies
+- sql_scripts/05_L0_L1_update.sql : ETL script updating any changes in existing records
+
+#### **reports on the data**
+- questions.sql 
+    - report on gender composition of the users
+    - report on youngest and olders user per country
+
 
 --------
 
