@@ -2,9 +2,28 @@
 
 Data pipeline and datawarehouse for music games.
 
+The aim of this project is to create a small Datawarehouse, populated with data about users of two games. The data comes from two systems and analysis will be done on both systems at once.
 
-* Free software: MIT license
-* Documentation: 
+The solution is based on Python with a database running on PostgreSQL. Database has two layers (schemas), one for import of data files and one with transformed data available for analysis. It is possible to load data from this layer to end-user systems for analysis. It is also possible to do analysis in SQL and build a datamart level on top of the data directly in the database.
+
+Virtual environments for both systems are created using Docker and are managed by Docker-compose.
+
+### Main files:
+- musicdwh/musicdwh.py
+
+Python script opening extract files from a given date. Games have two sources, "hb" in .csv and "wwc" in .json. They come in once a day and are exported into folder structure based on date.
+- hb data contain IP address, but miss country code. To obtain country code we utilize ipapi, which unfortunately in the free tier has limits of queries. Therefore the data is passed in chunks and there is waiting time between chunks.
+This makes the code run slowly. There are other IP converters available, all have limits in free tier. Paid tier would be without these limitations.
+- wwc data comes in .json format, one cell can contain lists of different values. The lists are parsed into new columns of dataframe upon load.
+- two lists of values (LOVs) have been added to the load to enable saving repetitive data in separate tables.
+- data in the database is updated with new values, right now there is no historization feature. This can be added in the future.
+
+--------
+
+## Issues / TODO
+- long run time due to lookup of IP addresses
+- more tests need to be added
+- Docker-compose does not create correct connection between Python and database
 
 
 ## Features
@@ -14,6 +33,7 @@ Data pipeline and datawarehouse for music games.
 * clean data
 * create data pipeline
 * import user accounts
+* update any modified records
 
 ## Prerequisites
 --------
@@ -29,12 +49,16 @@ git clone
 ## Getting Started
 * start service:
 ```
-docker-compose up
+docker-compose down && docker-compose build && docker-compose up
+
 ```
 * set env var
 ```
-export DATA_DATE='2021-04-29'
+export DATA_DATE='2021-04-28'
 ```
 
 ## Credits
 -------
+
+## License
+* Free software: MIT license
