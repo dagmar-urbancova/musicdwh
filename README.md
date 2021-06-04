@@ -1,3 +1,5 @@
+![logo](logo.png)
+
 # music data warehouse
 
 Data pipeline and datawarehouse for music games.
