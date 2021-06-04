@@ -17,7 +17,7 @@ Python script opening extract files from a given date. Games have two sources, "
 This makes the code run slowly. There are other IP converters available, all have limits in free tier. Paid tier would be without these limitations.
 - `wwc` data comes in .json format, one cell can contain lists of different values. The lists are parsed into new columns of dataframe upon load.
 - two lists of values (LOVs) have been added to the load to enable saving repetitive data in separate tables.
-- data in the database is updated with new values, right now there is no historization feature. This can be added in the future.
+- data in the database is updated with new values, at the moment there is no historization feature. This can be added in the future.
 
 #### **SQL scripts working with the data:**
 - `sql_scripts/startup_sql_scripts` : scripts setting up the database, tables and views
@@ -48,13 +48,16 @@ Sources `hb` and `wwc` are united into table `user_account` and detailed informa
 - `user_address` - address details 
 - `user_phone` - user telephone numbers (this table can be simplified in the future to contain phone number and indicator of type)
 -  `user_picture` - photos of user accounts (this table can be simplified in the future to contain picture reference and indicator of type)
+
 ![diagram of Layer1](L1_diagram.png)
 
-### ** Logical mapping of data **
+### **Logical mapping of data**
 Data from both source systems is mapped into Layer1 main user table `layer1.user_account`
 ![logical mapping](L0_L1_logical_mapping.png)
+ID values for gender and title are taken from LOV tables via foreign keys.
 
 Detailed information from `wwc` source is mapped into detail tables, e.g. users' addresses into table `layer1.user_address`
+
 ![user address mapping](L1_user_address_mapping.png)
 
 
@@ -63,14 +66,15 @@ Detailed information from `wwc` source is mapped into detail tables, e.g. users'
 ## Issues / TODO
 - long run time due to lookup of IP addresses via API due to free tier restrictions
 - more tests need to be added
-
+- improve security, no plaintext secrets
+- create indexes on tables in `layer1`
 
 ## Features
 --------
 
 * create a database schema
 * clean data
-* create data pipeline
+* create data pipeline (ETL)
 * import user accounts
 * update any modified records
 * generate reports in SQL
@@ -90,9 +94,23 @@ git clone https://github.com/dagmar-urbancova/musicdwh
 * start service:
 ```
 docker-compose up --build
-
 ```
-* set env var
+
+To run  `another day's data` , modify env var DATA_DATE to different date, e.g.:
+```
+export DATA_DATE='2021-04-29'
+```
+
+making sure the folder structure contains this date
+
+and run the Python script
+```
+python musicdwh/musicdwh.py
+```
+
+### **In case of issues with running from Docker-compose:**
+* set env var (set by docker containers automatically)
+
 ```
 export DATA_DATE='2021-04-28'
 ```
@@ -102,19 +120,10 @@ In case Python does not connect to the database, run .py manually.
 python musicdwh/musicdwh.py
 ```
 
-To run `another day's data`, modify env var DATA_DATE to different date, e.g.:
-```
-export DATA_DATE='2021-04-29'
-```
-making sure the folder structure contains this date
-
-and run the Python script
-```
-python musicdwh/musicdwh.py
-```
-
 ## Credits
 -------
+Docker-related advice from Vitek at https://github.com/squeaky-godzilla
 
+-------
 ## License
 * Free software: MIT license

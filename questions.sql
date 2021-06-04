@@ -61,6 +61,6 @@ order by src.country_id
 
 /* 04 - list of principles you would follow when developing an event pipeline */
 /*
-
+- use some of the available technologies: Apache Kafka, AWS Kinesis, RabbitMQ, AWS SMS, Azure Service Bus Event Hub, and Google Pub/Sub
 
 */
