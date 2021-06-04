@@ -24,16 +24,44 @@ This makes the code run slowly. There are other IP converters available, all hav
 - `sql_scripts/04_L0_L1_load.sql` : ETL script processing data from layer0 to layer1, creating dependencies
 - `sql_scripts/05_L0_L1_update.sql` : ETL script updating any changes in existing records
 
-#### **reports on the data**
-- questions.sql 
+#### **Reports on the data**
+- `questions.sql`
     - report on gender composition of the users
-    - report on youngest and olders user per country
+    - report on youngest and oldest user per country
+    - answers to task questions
+
+## Database diagram and mappings
+### **Layer0**
+Import layer for data, raw data is inserted into cleared tables.
+Raw data is then accessed using views, in which some columns are transformed (`v_import_data_hb`, `v_import_data_wwc`).
+![diagram of Layer0](L0_diagram.png)
+
+### **Layer1**
+Layer for processed data. 
+
+LOVs (lists of values) are imported from Layer0 and their IDs are used in the main data tables. 
+- `lov_title` - list of values of title
+- `lov_gender` - list of values of gender
+
+Sources `hb` and `wwc` are united into table `user_account` and detailed information from source `wwc` is stored in tables: 
+- `account_login` - login details 
+- `user_address` - address details 
+- `user_phone` - user telephone numbers (this table can be simplified in the future to contain phone number and indicator of type)
+-  `user_picture` - photos of user accounts (this table can be simplified in the future to contain picture reference and indicator of type)
+![diagram of Layer1](L1_diagram.png)
+
+### ** Logical mapping of data **
+Data from both source systems is mapped into Layer1 main user table `layer1.user_account`
+![logical mapping](L0_L1_logical_mapping.png)
+
+Detailed information from `wwc` source is mapped into detail tables, e.g. users' addresses into table `layer1.user_address`
+![user address mapping](L1_user_address_mapping.png)
 
 
 --------
 
 ## Issues / TODO
-- long run time due to lookup of IP addresses
+- long run time due to lookup of IP addresses via API due to free tier restrictions
 - more tests need to be added
 
 
@@ -45,6 +73,7 @@ This makes the code run slowly. There are other IP converters available, all hav
 * create data pipeline
 * import user accounts
 * update any modified records
+* generate reports in SQL
 
 ## Prerequisites
 --------
@@ -77,6 +106,8 @@ To run `another day's data`, modify env var DATA_DATE to different date, e.g.:
 ```
 export DATA_DATE='2021-04-29'
 ```
+making sure the folder structure contains this date
+
 and run the Python script
 ```
 python musicdwh/musicdwh.py

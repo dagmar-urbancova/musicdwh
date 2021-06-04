@@ -25,13 +25,31 @@ except:
     print('Envvar POSTGRES_PASSWORD not set.')
     sys.exit(1)
 
+try:
+    POSTGRES_USER = os.environ['POSTGRES_USER']
+    print('Using password from POSTGRES_USER')
+except:
+    print('Envvar POSTGRES_USER not set.')
+    sys.exit(1)
+
+
+try:
+    POSTGRES_DB = os.environ['POSTGRES_DB']
+    print('Using password from POSTGRES_DB')
+except:
+    print('Envvar POSTGRES_DB not set.')
+    sys.exit(1)
+
+
 # define database connection
-db_name = 'docker'
-db_user = 'docker'
+db_name = POSTGRES_DB
+db_user = POSTGRES_USER
 db_pass = POSTGRES_PASSWORD
 db_host = 'database'
 db_port = '5432'
-DB_CONNECTION = 'postgresql://{}:{}@{}:{}/{}'.format(db_user, db_pass, db_host, db_port, db_name)
+DB_CONNECTION = 'postgresql://{}:{}@{}:{}/{}'.format(
+    db_user, db_pass, db_host, db_port, db_name
+)
 
 # define constants
 DATA_PATH = './data'
@@ -39,6 +57,7 @@ DB_LAYER_0 = 'layer0'
 DB_LAYER_1 = 'layer1'
 RETRY_COUNT = 5
 DELAY_TIME = 5
+
 
 def import_hb(file_path):
     # import csv file - hb
@@ -124,7 +143,7 @@ def import_game (
     date_d = export_date_d.strftime("%d")
     #data_path = '/musicdwh/musicdwh/data/'
     wwc_path = '/wwc/{}/{}/{}/wwc.json'.format(date_y, date_m, date_d)
-    hb_path = '/hb' + '/' + date_y + '/' + date_m + '/' + date_d + '/hb.csv'
+    hb_path = '/hb/{}/{}/{}/hb.csv'.format(date_y, date_m, date_d)
     # expecting date in format 'YYYY-MM-DD'
     if game_id == 'wwc':
         imported_data = import_wwc(data_path + wwc_path)
@@ -143,12 +162,12 @@ def connect_to_db(db_con, retry_count, delay):
     
     return engine
 
-def upload_to_db    (
-                    df, 
-                    db_table, 
-                    engine, 
-                    db_schema
-                    ):
+def upload_to_db(
+                df, 
+                db_table, 
+                engine, 
+                db_schema
+                ):
     sql = sqla.text("TRUNCATE TABLE {}.{}".format(db_schema, db_table))
     try:
         engine.execute(sql)
@@ -156,9 +175,11 @@ def upload_to_db    (
         print("{}.{} - Table does not exist.".format(db_schema, db_table))
     df.to_sql(db_table, engine, schema=db_schema, if_exists='append')
 
+
 # main script
 if __name__ == '__main__':
-    print("=================================starting load====================================")
+    print("================================= starting load =================================")
+    # create database connection
     engine = connect_to_db(DB_CONNECTION, RETRY_COUNT, DELAY_TIME)
     # populate LOVs
     LOV_PATH = '{}/LOVs'.format(DATA_PATH)
@@ -166,8 +187,9 @@ if __name__ == '__main__':
     gender_df = import_lov('{}/LOV_gender.csv'.format(LOV_PATH))
     upload_to_db (gender_df, 'lov_gender', engine, DB_LAYER_0)
     #LOV_title
-    gender_df = import_lov('{}/LOV_title.csv'.format(LOV_PATH))
-    upload_to_db (gender_df, 'lov_title', engine, DB_LAYER_0)
+    title_df = import_lov('{}/LOV_title.csv'.format(LOV_PATH))
+    upload_to_db (title_df, 'lov_title', engine, DB_LAYER_0)
+
 
     # load wwc data
     data_wwc = import_game ('wwc', DATA_DATE, DATA_PATH)
@@ -180,15 +202,17 @@ if __name__ == '__main__':
     # append country code to hb dataframe
     data_hb['country_code']=ip_code_series
 
+
     # upload daily data to database, schema L0
     upload_to_db (data_hb, 'import_data_hb', engine, DB_LAYER_0)
     upload_to_db (data_wwc, 'import_data_wwc', engine, DB_LAYER_0)
 
-    # run updates
+    # run load to Layer1
     with open('./sql_scripts/04_L0_L1_load.sql', 'r') as sql_file:
         script_string = sql_file.read()
         print('Running insert script L0_L1_load')
         db_script = engine.execute(script_string)
+    # run updates on existing records
     with open('./sql_scripts/05_L0_L1_update.sql', 'r') as sql_file:
         script_string = sql_file.read()
         print('Running update script L0_L1_update')

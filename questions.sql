@@ -1,9 +1,14 @@
 /*
+Questions:
 1) Could you find what is the gender ratio in each game?
 2) Try to list the youngest and oldest player per country.
 3) If you suddenly had millions of new events for the accounts to process per day, how would
 you make the data pipeline faster and more scalable and more reliable? 
 Bonus) Can you summarize a list of principles you would follow when developing an event pipeline?
+*/
+
+/*
+Answers:
 */
 
 /*01 - get count by gender and game*/

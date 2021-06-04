@@ -1,6 +1,6 @@
 CREATE SCHEMA IF NOT EXISTS layer0;
 
-CREATE TABLE "layer0".import_data_wwc
+CREATE TABLE layer0.import_data_wwc
 (
     index bigint,
     gender_1 text,
@@ -31,7 +31,7 @@ CREATE TABLE "layer0".import_data_wwc
 );
 
 
-CREATE TABLE "layer0".import_data_hb
+CREATE TABLE layer0.import_data_hb
 (
     index bigint,
     id bigint,

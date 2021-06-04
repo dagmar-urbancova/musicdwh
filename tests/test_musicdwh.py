@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 
 """Tests for `musicdwh` package."""
-#import sys
-#sys.path.append('..')
 import pytest
 import pandas as pd
 from pandas._testing import assert_frame_equal
@@ -18,10 +16,12 @@ WWC_FILE_PATH_UPD = './data/wwc/2021/04/29/wwc.json'
 DATE_INS = '2021-04-28'
 DATE_UPD = '2021-04-29'
 
+
 def test_import_hb_dataframe_type():
     # tests, if returns type DataFrame
     df_import = import_hb(HB_FILE_PATH_INS) 
     assert "pandas.core.frame.DataFrame" in str(type(df_import))
+
 
 def test_import_hb_dataframe_data():
     # tests, if returns correct data in DataFrame
@@ -39,6 +39,7 @@ def test_import_hb_dataframe_data():
 
     df_import = import_hb(HB_FILE_PATH_INS) 
     assert_frame_equal(df_import, df)
+
 
 def test_ip_convert_country():
     # tests lookup of country ID from IP_address
@@ -62,6 +63,7 @@ def test_ip_convert_country():
     df_import['country_code']=ip_code_series    
     assert_frame_equal(df_import, df)
 
+
 def test_import_game_hb():
     # test importing hb data into dataframe by calling parent function
     df_import = import_game ('hb', DATE_INS, './data')
@@ -78,15 +80,6 @@ def test_import_game_hb():
     df = pd.DataFrame(data)    
     assert_frame_equal(df_import, df)
 
-# def test_import_hb_update():      
-#     assert import_hb(HB_FILE_PATH_UPD) == [expected_output] "This will not be printed if assertion passes"
-
-# def test_import_wwc_new():
-#     assert import_wwc(WWC_FILE_PATH_INS) == [expected_output] "This will not be printed if assertion passes"
-
-# def test_import_wwc_update():
-#     assert import_wwc(WWC_FILE_PATH_UPD) == [expected_output] "This will not be printed if assertion passes"
-
 
 def test_import_lov():
     # test importing LOV data into dataframe
@@ -96,6 +89,17 @@ def test_import_lov():
     # Create DataFrame
     df = pd.DataFrame(data)    
     assert_frame_equal(df_import, df)
+
+
+# def test_import_hb_update():      
+#     assert import_hb(HB_FILE_PATH_UPD) == [expected_output] 
+
+# def test_import_wwc_new():
+#     assert import_wwc(WWC_FILE_PATH_INS) == [expected_output] 
+
+# def test_import_wwc_update():
+#     assert import_wwc(WWC_FILE_PATH_UPD) == [expected_output] 
+
 
 # def test_ip_convert_country():
 

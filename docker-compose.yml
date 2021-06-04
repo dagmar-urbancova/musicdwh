@@ -22,7 +22,9 @@ services:
       dockerfile: "loader.Dockerfile"
       context: .
     environment: 
+      - POSTGRES_USER=docker
       - POSTGRES_PASSWORD=docker
+      - POSTGRES_DB=docker
       - DATA_DATE=2021-04-29
     volumes: 
       - ./data/:/data/
