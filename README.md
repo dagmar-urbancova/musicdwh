@@ -68,6 +68,7 @@ Detailed information from `wwc` source is mapped into detail tables, e.g. users'
 - more tests need to be added
 - improve security, no plaintext secrets
 - create indexes on tables in `layer1`
+- it is necessary to discuss with data owners the necessity (and legality) or storing and exporting plaintext login details
 
 ## Features
 --------
